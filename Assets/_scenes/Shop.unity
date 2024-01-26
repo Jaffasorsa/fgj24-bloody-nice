@@ -477,6 +477,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7987486b32224d5469e04a95766d53cd, type: 2}
   - {fileID: 11400000, guid: 2d524a86163752d439aedd091a3051a2, type: 2}
   buttonPrefab: {fileID: 1693118893606967322, guid: 750ac543398704045a40098cb0cd27de, type: 3}
+  canvasRoot: {fileID: 498964397}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
