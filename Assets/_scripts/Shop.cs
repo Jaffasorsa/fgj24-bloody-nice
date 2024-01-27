@@ -18,10 +18,34 @@ public class Shop : MonoBehaviour
 	[SerializeField]
 	protected Transform canvasRoot;
 
-	public void Start()
+	[SerializeField]
+	protected List<Button> visibleButtons = new List<Button>();
+
+	public void OnEnable()
 	{
+		OpenTheShop();
+	}
+
+	public void OnDisable()
+	{
+		CloseTheShop();
+	}
+
+	protected void OpenTheShop()
+	{
+		Debug.Log("Shop opens");
+
 		LoadData();
 		SetButtons();
+
+	}
+
+	protected void CloseTheShop()
+	{
+		Debug.Log("Shop closes");
+
+		SaveData();
+		DestroyButtons();
 	}
 
 	/// <summary>
@@ -40,6 +64,9 @@ public class Shop : MonoBehaviour
 			RectTransform rectTransform = buttonGameObject.GetComponentInChildren<RectTransform>();
 			Button button = buttonGameObject.GetComponentInChildren<Button>();
 
+			// Add the button into the visible list
+			visibleButtons.Add(button);
+
 			// Name the button
 			textMeshProUGUI.text = item.Name;
 
@@ -51,6 +78,17 @@ public class Shop : MonoBehaviour
 			buttonGameObject.transform.position = new Vector3(rectTransform.sizeDelta.x * 0.5f, currentScreenYPosition, 0);
 			currentScreenYPosition -= rectTransform.sizeDelta.y * 0.5f;
 		}
+	}
+
+	public void DestroyButtons()
+	{
+		foreach (var button in visibleButtons)
+		{
+			button.onClick.RemoveAllListeners();
+			Destroy(button.gameObject);
+		}
+
+		visibleButtons.Clear();
 	}
 
 	/// <summary>
