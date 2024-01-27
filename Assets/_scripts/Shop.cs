@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -6,7 +8,9 @@ using UnityEngine.UI;
 public class Shop : MonoBehaviour
 {
 	[SerializeField]
-	protected List<UpgradeInventoryItem> upgradeInventoryItems;
+	protected List<ScriptableUpgradeInventoryItem> allUpgradeInventoryItems;
+
+	public static Dictionary<string, UpgradeInventoryItem> OwnedUpgradeInventoryItems;
 
 	[SerializeField]
 	protected GameObject buttonPrefab;
@@ -16,15 +20,18 @@ public class Shop : MonoBehaviour
 
 	public void Start()
 	{
+		LoadData();
 		SetButtons();
-		ShowPurchases();
 	}
 
+	/// <summary>
+	/// Sets the buttons on the screen
+	/// </summary>
 	public void SetButtons()
 	{
 		float currentScreenYPosition = Screen.height;
 
-		foreach (UpgradeInventoryItem item in upgradeInventoryItems)
+		foreach (ScriptableUpgradeInventoryItem item in allUpgradeInventoryItems)
 		{
 			// Instantiation
 			GameObject buttonGameObject = Instantiate(buttonPrefab, canvasRoot);
@@ -46,29 +53,59 @@ public class Shop : MonoBehaviour
 		}
 	}
 
-	public void PurchaseItem(UpgradeInventoryItem upgradeInventoryItem)
+	/// <summary>
+	/// Purchase upgrade
+	/// </summary>
+	/// <param name="upgradeInventoryItem"></param>
+	public void PurchaseItem(ScriptableUpgradeInventoryItem upgradeInventoryItem)
 	{
-		Debug.Log(upgradeInventoryItem.name);
-
-		List<string> currentUpgrades = JsonUtility.FromJson<List<string>>(PlayerPrefs.GetString("upgrades", ""));
-
-		currentUpgrades.Add(upgradeInventoryItem.name);
-
-		//string reSerializedUpgrades = 
+		OwnedUpgradeInventoryItems[upgradeInventoryItem.name] = new UpgradeInventoryItem(upgradeInventoryItem.name, 0);
 	}
 
+	/// <summary>
+	/// TODO: Remove me. I am just for development purposes
+	/// </summary>
 	public void ShowPurchases()
 	{
-		if (PlayerPrefs.GetString("upgrades", "") == "")
+		string purchases = "";
+		foreach ((string s, UpgradeInventoryItem u) in OwnedUpgradeInventoryItems)
 		{
-			Debug.Log("No upgrade items");
+			purchases += u.Name + ",";
+		}
+
+		Debug.Log(purchases);
+	}
+
+	/// <summary>
+	/// Saves the dictionary of owned upgrades to PlayerPrefs
+	/// </summary>
+	protected void SaveData()
+	{
+		string serializedListOfUpgrades = JsonConvert.SerializeObject(OwnedUpgradeInventoryItems);
+		PlayerPrefs.SetString("upgrades", serializedListOfUpgrades);
+	}
+
+	/// <summary>
+	/// Loads the dictionary of owned upgrades from PlayerPrefs
+	/// </summary>
+	protected void LoadData()
+	{
+		string upgradesFromPlayerPrefs = PlayerPrefs.GetString("upgrades", "");
+
+		if (upgradesFromPlayerPrefs == "")
+		{
+			OwnedUpgradeInventoryItems = new();
 			return;
 		}
 
-
-		foreach (string upgradeItem in JsonUtility.FromJson<List<string>>(PlayerPrefs.GetString("upgrades", "")))
+		try
 		{
-			Debug.Log(upgradeItem);
+			OwnedUpgradeInventoryItems = JsonConvert.DeserializeObject<Dictionary<string, UpgradeInventoryItem>>(upgradesFromPlayerPrefs);
+		}
+		catch (Exception e)
+		{
+			Debug.Log($"Some issue with getting the data, creating new dictionary for owned items: {e}");
+			OwnedUpgradeInventoryItems = new();
 		}
 	}
 }
