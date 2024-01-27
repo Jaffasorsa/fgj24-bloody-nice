@@ -7,6 +7,9 @@ public class BeanEater : MonoBehaviour
 	[SerializeField]
 	private Animator animator;
 
+	[SerializeField]
+	private Rigidbody2D rb;
+
 	private float fuel = 0f;
 
 	private float fuelPerServing = 10f;
@@ -23,5 +26,10 @@ public class BeanEater : MonoBehaviour
 	{
 		fuel += fuelPerServing;
 		animator.SetBool("Eating", value);
+	}
+
+	public void Launch(float power)
+	{
+
 	}
 }

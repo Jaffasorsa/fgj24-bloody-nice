@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-	[SerializeField]
-	private Transform target;
+	public Transform target;
 
 	private void LateUpdate()
 	{
@@ -14,6 +13,8 @@ public class CameraController : MonoBehaviour
 
 	private void UpdatePosition()
 	{
+		if (target == null) return;
+
 		transform.position = target.position + Vector3.back * 10;
 	}
 }
