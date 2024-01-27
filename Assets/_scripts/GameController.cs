@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,9 @@ public class GameController : MonoBehaviour
 
 	[SerializeField]
 	private CameraController cameraController;
+
+	[SerializeField]
+	private TextMeshProUGUI statDisplayText;
 
 	[Header("Eating")]
 	[SerializeField]
@@ -190,7 +194,7 @@ public class GameController : MonoBehaviour
 
 			power = Mathf.PingPong(timer, 1f);
 
-			powerBar.sizeDelta = new Vector2(startLength.x * (timer / eatingTimeLimit), startLength.y);
+			powerBar.sizeDelta = new Vector2(startLength.x * power, startLength.y);
 
 			yield return null;
 		}
@@ -210,5 +214,10 @@ public class GameController : MonoBehaviour
 		eatingPanel.SetActive(panel == Panel.Eating);
 		aimingPanel.SetActive(panel == Panel.Aiming);
 		launchPanel.SetActive(panel == Panel.Launch);
+	}
+
+	public void UpdateStatDisplay(string text)
+	{
+		statDisplayText.text = text;
 	}
 }

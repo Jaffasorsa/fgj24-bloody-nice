@@ -7,10 +7,16 @@ using UnityEngine.UIElements;
 public class BackgroundController : MonoBehaviour
 {
 	[SerializeField]
+	private GameObject groundPrefab;
+
+	[SerializeField]
 	private GameObject skyPrefab;
 
 	[SerializeField]
 	private GameObject nightSkyPrefab;
+
+	[SerializeField]
+	private Transform groundContainer;
 
 	[SerializeField]
 	private Transform skyContainer;
@@ -19,7 +25,7 @@ public class BackgroundController : MonoBehaviour
 	private Transform cloudEmitter;
 
 	[SerializeField]
-	private float skyTileSize = 20.48f;
+	private float tileSize = 20.48f;
 
 	[SerializeField]
 	private float cloudAltitude = 20f;
@@ -35,6 +41,10 @@ public class BackgroundController : MonoBehaviour
 
 	private ParticleSystem cloudEmitterPS;
 
+	private List<(GameObject, SpriteRenderer)> groundPool = new List<(GameObject, SpriteRenderer)>();
+	private List<(int, GameObject, SpriteRenderer)> activeGroundTiles = new List<(int, GameObject, SpriteRenderer)>(); // For linear search
+	private Dictionary<int, GameObject> groundTileDict = new Dictionary<int, GameObject>(); // For random search
+
 	private List<(GameObject, SpriteRenderer)> skyPool = new List<(GameObject, SpriteRenderer)>();
 	private List<(int, GameObject, SpriteRenderer)> activeSkyTiles = new List<(int, GameObject, SpriteRenderer)>(); // For linear search
 	private Dictionary<int, GameObject> skyTileDict = new Dictionary<int, GameObject>(); // For random search
@@ -43,7 +53,7 @@ public class BackgroundController : MonoBehaviour
 	private List<(int, GameObject, SpriteRenderer)> activeNightSkyTiles = new List<(int, GameObject, SpriteRenderer)>(); // For linear search
 	private Dictionary<int, GameObject> nightSkyTileDict = new Dictionary<int, GameObject>(); // For random search
 
-	private int CurrentTile => (int)Mathf.Round(target.position.x / skyTileSize);
+	private int CurrentTile => (int)Mathf.Round(target.position.x / tileSize);
 	private bool CloudsEnabled => target.position.y > cloudAltitude && target.position.y < spaceAltitude;
 	private float SkyTransparency => 1f - Mathf.Clamp01((target.position.y - spaceAltitude) / spaceFade);
 	private int lastTile = -10;
@@ -69,8 +79,9 @@ public class BackgroundController : MonoBehaviour
 
 		if (CurrentTile != lastTile)
 		{
-			UpdateSky(ref skyPool, ref activeSkyTiles, ref skyTileDict, skyPrefab);
-			UpdateSky(ref nightSkyPool, ref activeNightSkyTiles, ref nightSkyTileDict, nightSkyPrefab);
+			UpdateSky(ref groundPool, ref activeGroundTiles, ref groundTileDict, groundPrefab, groundContainer, Vector3.down * (tileSize / 2f));
+			UpdateSky(ref skyPool, ref activeSkyTiles, ref skyTileDict, skyPrefab, skyContainer, Vector3.zero);
+			UpdateSky(ref nightSkyPool, ref activeNightSkyTiles, ref nightSkyTileDict, nightSkyPrefab, skyContainer, Vector3.zero);
 		}
 
 		foreach ((int, GameObject, SpriteRenderer) tile in activeSkyTiles)
@@ -78,7 +89,7 @@ public class BackgroundController : MonoBehaviour
 			tile.Item3.color = new Color(1f, 1f, 1f, SkyTransparency);
 		}
 
-		void UpdateSky(ref List<(GameObject, SpriteRenderer)> pool, ref List<(int, GameObject, SpriteRenderer)> tileList, ref Dictionary<int, GameObject> tileDict, GameObject prefab)
+		void UpdateSky(ref List<(GameObject, SpriteRenderer)> pool, ref List<(int, GameObject, SpriteRenderer)> tileList, ref Dictionary<int, GameObject> tileDict, GameObject prefab, Transform container, Vector3 offset)
 		{
 			lastTile = CurrentTile;
 
@@ -116,11 +127,11 @@ public class BackgroundController : MonoBehaviour
 					else
 					{
 						GameObject tileObject = Instantiate(prefab);
-						tileObject.transform.parent = skyContainer;
+						tileObject.transform.parent = container;
 						tile = (i, tileObject, tileObject.GetComponent<SpriteRenderer>());
 					}
 
-					tile.Item2.transform.localPosition = Vector3.right * i * skyTileSize;
+					tile.Item2.transform.localPosition = Vector3.right * i * tileSize + offset;
 
 					tileList.Add(tile);
 					tileDict.Add(tile.Item1, tile.Item2);
