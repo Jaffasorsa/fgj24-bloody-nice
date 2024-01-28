@@ -3,29 +3,50 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
 {
+	// Assign in editor
+
+	[SerializeField]
+	protected GameObject UpgradeUIItemPrefab;
+
+	[SerializeField]
+	protected Transform upgradesRoot;
+
+	[SerializeField]
+	protected TextMeshProUGUI moneyDisplay;
+
+	[SerializeField]
+	protected TextMeshProUGUI mainDisplayText;
+
 	[SerializeField]
 	protected List<ScriptableUpgradeInventoryItem> upgradeInventoryInEditor = new();
 
+	// Private/Protected
+
 	protected Dictionary<string, ScriptableUpgradeInventoryItem> upgradeInventory = new();
+	protected Dictionary<string, UpgradeUIItem> visibleUIItems = new();
+
+	// Public
 
 	public static Dictionary<string, UpgradeInventoryItem> OwnedUpgrades = new();
-	public static float Money = 20000f;
+	public static float Money = 500f;
 
-	[SerializeField]
-	protected GameObject buttonPrefab;
-
-	[SerializeField]
-	protected Transform canvasRoot;
-
-	[SerializeField]
-	protected Dictionary<string, Button> visibleButtons = new();
+	public static Shop Instance { get; private set; }
 
 	public void Awake()
 	{
+		if (Instance != this && Instance != null)
+		{
+			Debug.LogError("You can't have more than one Shop.");
+			Destroy(this);
+		}
+		else
+		{
+			Instance = this;
+		}
+
 		ConvertUpgradeInventoryItemsFromListToDictionary();
 	}
 
@@ -34,82 +55,84 @@ public class Shop : MonoBehaviour
 		OpenTheShop();
 	}
 
-	public void OnDisable()
-	{
-		CloseTheShop();
-	}
-
 	protected void OpenTheShop()
 	{
 		LoadData();
-		SetButtons();
+		SetUpgradesAndMoney();
 	}
 
-	protected void CloseTheShop()
+	public void CloseTheShop()
 	{
 		SaveData();
-		DestroyButtons();
+		DestroyUpgrades();
+		GameController.Instance.Play();
+		transform.parent.transform.gameObject.SetActive(false);
 	}
 
 	/// <summary>
 	/// Sets the buttons on the screen
 	/// </summary>
-	protected void SetButtons()
+	protected void SetUpgradesAndMoney()
 	{
-		float currentScreenYPosition = Screen.height;
+		DestroyUpgrades();
 
-		foreach (ScriptableUpgradeInventoryItem item in upgradeInventory.Values)
+		foreach (ScriptableUpgradeInventoryItem scriptableUpgradeInventoryItem in upgradeInventory.Values)
 		{
-			// Instantiation
-			GameObject buttonGameObject = Instantiate(buttonPrefab, canvasRoot);
-
-			TextMeshProUGUI textMeshProUGUI = buttonGameObject.GetComponentInChildren<TextMeshProUGUI>();
-			RectTransform rectTransform = buttonGameObject.GetComponentInChildren<RectTransform>();
-			Button button = buttonGameObject.GetComponentInChildren<Button>();
-
-			// Add the button into the visible list
-			visibleButtons[item.Name] = button;
-
-			// Name the button
-			textMeshProUGUI.text = $"{item.Name}\n{item.Price} ";
-
-			// Set up the click event
-			button.onClick.AddListener(delegate { PurchaseItem(item); });
-
-			// Set the position, also updating variable for next button 
-			currentScreenYPosition -= rectTransform.sizeDelta.y * 0.5f;
-			buttonGameObject.transform.position = new Vector3(rectTransform.sizeDelta.x * 0.5f, currentScreenYPosition, 0);
-			currentScreenYPosition -= rectTransform.sizeDelta.y * 0.5f;
+			CreateUpgradeUIItemIfRequired(scriptableUpgradeInventoryItem);
 		}
 
-		CheckAndDisableButtonsIfNeeded();
+		moneyDisplay.text = $"Money: {Money}";
+
+		if (visibleUIItems.Count == 0)
+		{
+			mainDisplayText.text = "No upgrades to purchase";
+		}
 	}
 
 	/// <summary>
 	/// Checks all the buttons to see if they need disabling
 	/// </summary>
-	protected void CheckAndDisableButtonsIfNeeded()
+	protected void CreateUpgradeUIItemIfRequired(ScriptableUpgradeInventoryItem scriptableUpgradeInventoryItem)
 	{
-		foreach (var upgradeInventoryItem in upgradeInventory.Values)
-		{
-			// Disable if already purchased or not enough cash
-			if (Money < upgradeInventoryItem.Price || (OwnedUpgrades.ContainsKey(upgradeInventoryItem.Name) && OwnedUpgrades[upgradeInventoryItem.name]?.UpgradeLevel >= upgradeInventoryItem.maxUpgradeLevel))
-				visibleButtons[upgradeInventoryItem.name].interactable = false;
-		}
+		// Don't show if already owned
+		if (OwnedUpgrades.ContainsKey(scriptableUpgradeInventoryItem.Name) &&
+		OwnedUpgrades[scriptableUpgradeInventoryItem.name]?.UpgradeLevel >= scriptableUpgradeInventoryItem.maxUpgradeLevel)
+			return;
+
+		// CREATE BUTTON
+
+		// Instantiation
+		GameObject upgradeUiItemGameObject = Instantiate(UpgradeUIItemPrefab, upgradesRoot);
+		UpgradeUIItem upgradeUIItem = upgradeUiItemGameObject.GetComponentInChildren<UpgradeUIItem>();
+
+		// Add the UI item into the visible list
+		visibleUIItems[scriptableUpgradeInventoryItem.Name] = upgradeUIItem;
+
+		// Add the text
+		upgradeUIItem.SetMainText(scriptableUpgradeInventoryItem.Name);
+		upgradeUIItem.SetButtonText($"Buy me ({scriptableUpgradeInventoryItem.Price})");
+
+		// Set the icon - TODO: Maybe later
+
+		// Set up the click event
+		upgradeUIItem.Button.onClick.AddListener(delegate { PurchaseItem(scriptableUpgradeInventoryItem); });
+
+		// Disable button if not enough cash
+		if (Money < scriptableUpgradeInventoryItem.Price)
+			upgradeUIItem.Button.interactable = false;
 	}
 
 	/// <summary>
 	/// Destroy all the buttons and event subscriptions
 	/// </summary>
-	protected void DestroyButtons()
+	protected void DestroyUpgrades()
 	{
-		foreach (Button button in visibleButtons.Values)
+		foreach (UpgradeUIItem upgradeUIItem in visibleUIItems.Values)
 		{
-			button.onClick.RemoveAllListeners();
-			Destroy(button.gameObject);
+			upgradeUIItem.DestroyMe();
 		}
 
-		visibleButtons.Clear();
+		visibleUIItems.Clear();
 	}
 
 	/// <summary>
@@ -118,7 +141,8 @@ public class Shop : MonoBehaviour
 	/// <param name="upgradeInventoryItem"></param>
 	protected void PurchaseItem(ScriptableUpgradeInventoryItem upgradeInventoryItem)
 	{
-		if (Money < upgradeInventoryItem.Price) return;
+		if (Money < upgradeInventoryItem.Price ||
+		(OwnedUpgrades.ContainsKey(upgradeInventoryItem.Name) && OwnedUpgrades[upgradeInventoryItem.name]?.UpgradeLevel >= upgradeInventoryItem.maxUpgradeLevel)) return;
 
 		Money -= upgradeInventoryItem.Price;
 
@@ -133,7 +157,7 @@ public class Shop : MonoBehaviour
 			OwnedUpgrades[upgradeInventoryItem.name] = new UpgradeInventoryItem(upgradeInventoryItem.name, 1);
 		}
 
-		CheckAndDisableButtonsIfNeeded();
+		SetUpgradesAndMoney();
 	}
 
 	/// <summary>
@@ -168,7 +192,7 @@ public class Shop : MonoBehaviour
 			OwnedUpgrades = new();
 		}
 
-		float.TryParse(PlayerPrefs.GetString("money", ""), out Money);
+		//float.TryParse(PlayerPrefs.GetString("money", ""), out Money);
 	}
 
 	protected void ConvertUpgradeInventoryItemsFromListToDictionary()
