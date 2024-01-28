@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Afterburner
   Price: 100
-  maxUpgradeLevel: 0
+  maxUpgradeLevel: 1
   Icon: []
