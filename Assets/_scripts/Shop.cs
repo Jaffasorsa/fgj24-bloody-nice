@@ -55,6 +55,11 @@ public class Shop : MonoBehaviour
 		OpenTheShop();
 	}
 
+	private void Start()
+	{
+		CloseTheShop();
+	}
+
 	protected void OpenTheShop()
 	{
 		LoadData();
@@ -217,5 +222,13 @@ public class Shop : MonoBehaviour
 		}
 
 		Debug.Log(purchases);
+	}
+
+	public void ResetShop()
+	{
+		Money = 0;
+		OwnedUpgrades.Clear();
+		SetUpgradesAndMoney();
+		SaveData();
 	}
 }

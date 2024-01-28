@@ -100,9 +100,12 @@ public class GameController : MonoBehaviour
 
 	private void Init()
 	{
+		launchPad.transform.rotation = Quaternion.Euler(Vector3.zero);
+
 		if (beanEater) Destroy(beanEater.gameObject);
 		beanEater = Instantiate(beanEaterPrefab, launchPad.transform).GetComponent<BeanEater>();
 		beanEater.transform.position = beanEaterSpawn.position;
+		beanEater.transform.rotation = Quaternion.Euler(Vector3.zero);
 		cameraController.target = beanEater.transform;
 		launchPad.transform.localRotation = Quaternion.Euler(Vector3.zero);
 	}
@@ -139,6 +142,7 @@ public class GameController : MonoBehaviour
 			yield return null;
 		}
 
+		eatingTimerBar.sizeDelta = new Vector2(startLength.x, startLength.y);
 		foodBowl.SetActive(false);
 
 		Aiming();
@@ -210,6 +214,7 @@ public class GameController : MonoBehaviour
 			yield return null;
 		}
 
+		powerBar.sizeDelta = new Vector2(startLength.x, startLength.y);
 		launchButton.onClick.RemoveAllListeners();
 		Launched(power);
 	}
@@ -225,7 +230,7 @@ public class GameController : MonoBehaviour
 		eatingPanel.SetActive(panel == Panel.Eating);
 		aimingPanel.SetActive(panel == Panel.Aiming);
 		launchPanel.SetActive(panel == Panel.Launch);
-		launchPanel.SetActive(panel == Panel.Launch);
+		scorePanel.SetActive(panel == Panel.Score);
 	}
 
 	public void UpdateStatDisplay(string text)
