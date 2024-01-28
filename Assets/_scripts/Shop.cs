@@ -93,7 +93,7 @@ public class Shop : MonoBehaviour
 		foreach (var upgradeInventoryItem in upgradeInventory.Values)
 		{
 			// Disable if already purchased or not enough cash
-			if (Money < upgradeInventoryItem.Price || (OwnedUpgrades.ContainsKey(upgradeInventoryItem.Name) && OwnedUpgrades[upgradeInventoryItem.name]?.UpgradeLevel == upgradeInventoryItem.maxUpgradeLevel))
+			if (Money < upgradeInventoryItem.Price || (OwnedUpgrades.ContainsKey(upgradeInventoryItem.Name) && OwnedUpgrades[upgradeInventoryItem.name]?.UpgradeLevel >= upgradeInventoryItem.maxUpgradeLevel))
 				visibleButtons[upgradeInventoryItem.name].interactable = false;
 		}
 	}
@@ -122,7 +122,7 @@ public class Shop : MonoBehaviour
 
 		Money -= upgradeInventoryItem.Price;
 
-		// If the item is owned already, iterate the upgrade level
+		// If the item is owned already, iterate the upgrade level if not already at max
 		if (OwnedUpgrades.ContainsKey(upgradeInventoryItem.Name))
 		{
 			OwnedUpgrades[upgradeInventoryItem.name].UpgradeLevel++;
