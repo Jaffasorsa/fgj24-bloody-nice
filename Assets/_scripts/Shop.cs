@@ -180,24 +180,24 @@ public class Shop : MonoBehaviour
 	/// </summary>
 	protected void LoadData()
 	{
-		string upgradesFromPlayerPrefs = PlayerPrefs.GetString("upgrades", "");
+		//string upgradesFromPlayerPrefs = PlayerPrefs.GetString("upgrades", "");
 
-		if (upgradesFromPlayerPrefs == "")
-		{
-			return;
-		}
+		//if (upgradesFromPlayerPrefs == "")
+		//{
+		//	return;
+		//}
 
-		try
-		{
-			OwnedUpgrades = JsonConvert.DeserializeObject<Dictionary<string, UpgradeInventoryItem>>(upgradesFromPlayerPrefs);
-		}
-		catch (Exception e)
-		{
-			Debug.Log($"Some issue with getting the data, creating new dictionary for owned items: {e}");
-			OwnedUpgrades = new();
-		}
+		//try
+		//{
+		//	OwnedUpgrades = JsonConvert.DeserializeObject<Dictionary<string, UpgradeInventoryItem>>(upgradesFromPlayerPrefs);
+		//}
+		//catch (Exception e)
+		//{
+		//	Debug.Log($"Some issue with getting the data, creating new dictionary for owned items: {e}");
+		//	OwnedUpgrades = new();
+		//}
 
-		float.TryParse(PlayerPrefs.GetString("money", ""), out Money);
+		//float.TryParse(PlayerPrefs.GetString("money", ""), out Money);
 	}
 
 	protected void ConvertUpgradeInventoryItemsFromListToDictionary()
@@ -226,6 +226,7 @@ public class Shop : MonoBehaviour
 
 	public void ResetShop()
 	{
+		Debug.Log("reset");
 		Money = 0;
 		OwnedUpgrades.Clear();
 		SetUpgradesAndMoney();

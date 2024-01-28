@@ -115,7 +115,7 @@ public class BeanEater : MonoBehaviour
 			yield return null;
 		}
 
-		Shop.Money += Mathf.Max(0, (int)distance);
+		Shop.Money += Mathf.Max(0, Mathf.Floor(distance));
 		GameController.Instance.ActivateShop();
 	}
 

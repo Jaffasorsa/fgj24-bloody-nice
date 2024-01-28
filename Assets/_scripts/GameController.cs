@@ -87,10 +87,10 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	private void Start()
-	{
-		Play();
-	}
+	//private void Start()
+	//{
+	//	Play();
+	//}
 
 	public void Play()
 	{
@@ -158,7 +158,7 @@ public class GameController : MonoBehaviour
 
 	private void StartMovingLaunchPad()
 	{
-		aimButton.onClick.AddListener(() => { lockedIn = true; });
+		aimButton.onClick.AddListener(() => { lockedIn = true; aimButton.onClick.RemoveAllListeners(); });
 
 		StartCoroutine(MoveLaunchPad());
 	}
@@ -191,7 +191,7 @@ public class GameController : MonoBehaviour
 
 	private void StartLaunchPowerUp()
 	{
-		launchButton.onClick.AddListener(() => { launched = true; });
+		launchButton.onClick.AddListener(() => { launched = true; launchButton.onClick.RemoveAllListeners(); });
 		StartCoroutine(LaunchPowerUp());
 	}
 
@@ -200,6 +200,7 @@ public class GameController : MonoBehaviour
 	private IEnumerator LaunchPowerUp()
 	{
 		Vector2 startLength = powerBar.sizeDelta;
+		Debug.Log(startLength.x);
 		float timer = 0f;
 		float power = 0f;
 		launched = false;
