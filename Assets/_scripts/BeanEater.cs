@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEngine.Rendering.DebugUI;
 
 public class BeanEater : MonoBehaviour
 {
@@ -60,7 +61,7 @@ public class BeanEater : MonoBehaviour
 
 	public void EatBeans(bool value)
 	{
-		Fuel += fuelPerServing;
+		if (value) Fuel += fuelPerServing;
 		animator.SetBool("Eating", value);
 	}
 
@@ -79,6 +80,7 @@ public class BeanEater : MonoBehaviour
 
 	private IEnumerator Rocket(float power)
 	{
+		animator.SetBool("Flying", true);
 		rocketLaunched = true;
 		while (Fuel > 0f)
 		{
@@ -89,6 +91,7 @@ public class BeanEater : MonoBehaviour
 			yield return null;
 		}
 
+		animator.SetBool("Flying", false);
 		Fuel = 0f;
 	}
 

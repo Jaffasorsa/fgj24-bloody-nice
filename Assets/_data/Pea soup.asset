@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Pea soup
   m_EditorClassIdentifier: 
   Name: Pea soup
-  Price: 100
-  maxUpgradeLevel: 0
+  Price: 700
+  maxUpgradeLevel: 1
   Icon: []

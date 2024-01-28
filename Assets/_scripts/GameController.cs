@@ -148,6 +148,7 @@ public class GameController : MonoBehaviour
 	{
 		ChangePanel(Panel.Aiming);
 
+		beanEater.EatBeans(false);
 		StartMovingLaunchPad();
 	}
 
