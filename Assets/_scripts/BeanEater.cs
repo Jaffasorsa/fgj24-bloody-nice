@@ -55,7 +55,7 @@ public class BeanEater : MonoBehaviour
 
 	public bool ContainsUpgrade(string upgrade)
 	{
-		return Shop.OwnedUpgradeInventoryItems.ContainsKey(upgrade);
+		return Shop.OwnedUpgrades.ContainsKey(upgrade);
 	}
 
 	public void EatBeans(bool value)
