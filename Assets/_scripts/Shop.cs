@@ -31,7 +31,7 @@ public class Shop : MonoBehaviour
 	// Public
 
 	public static Dictionary<string, UpgradeInventoryItem> OwnedUpgrades = new();
-	public static float Money = 500f;
+	public static float Money = 0f;
 
 	public static Shop Instance { get; private set; }
 
@@ -192,7 +192,7 @@ public class Shop : MonoBehaviour
 			OwnedUpgrades = new();
 		}
 
-		//float.TryParse(PlayerPrefs.GetString("money", ""), out Money);
+		float.TryParse(PlayerPrefs.GetString("money", ""), out Money);
 	}
 
 	protected void ConvertUpgradeInventoryItemsFromListToDictionary()
