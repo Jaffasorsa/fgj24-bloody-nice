@@ -1,14 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BeanEater : MonoBehaviour
 {
+	[System.Serializable]
+	private class Upgrade
+	{
+		public string name;
+
+		public GameObject item;
+
+		public UnityEvent action;
+	}
+
 	[SerializeField]
 	private Animator animator;
 
 	[SerializeField]
 	private Rigidbody2D rb;
+
+	[SerializeField]
+	private List<Upgrade> upgrades = new List<Upgrade> { };
 
 	private float fuelPerServing = 10f;
 
@@ -17,10 +31,31 @@ public class BeanEater : MonoBehaviour
 	private float fuel = 0f;
 	private float Fuel { get => fuel; set { fuel = value; UpdateFuelDisplay(); } }
 
+	private void Awake()
+	{
+		Init();
+	}
+
 	public void Init()
 	{
-		Fuel = 0f;
-		// Load values
+		LoadUpgrades();
+	}
+
+	private void LoadUpgrades()
+	{
+		foreach (Upgrade upgrade in upgrades)
+		{
+			if (ContainsUpgrade(upgrade.name))
+			{
+				upgrade.item.SetActive(true);
+				upgrade.action?.Invoke();
+			}
+		}
+	}
+
+	public bool ContainsUpgrade(string upgrade)
+	{
+		return Shop.OwnedUpgradeInventoryItems.ContainsKey(upgrade);
 	}
 
 	public void EatBeans(bool value)
@@ -59,5 +94,11 @@ public class BeanEater : MonoBehaviour
 	public void UpdateFuelDisplay()
 	{
 		GameController.Instance.UpdateStatDisplay($"Fuel: {(int)Fuel}");
+	}
+
+	// Upgrade actions
+	public void UpgradeAfterburner()
+	{
+		fuelPotency = 150f;
 	}
 }
