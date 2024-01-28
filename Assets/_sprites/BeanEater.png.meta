@@ -350,6 +350,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Pea
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 254
+        width: 32
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6991f1d866cedf94f8fe746e50d4e7ad
+      internalID: 787943598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -368,6 +389,7 @@ TextureImporter:
       Head: -526644198
       LegL: -1129868448
       LegR: 942261267
+      Pea: 787943598
       Spoon: 509799459
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

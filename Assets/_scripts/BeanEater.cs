@@ -26,7 +26,7 @@ public class BeanEater : MonoBehaviour
 
 	private float fuelPerServing = 10f;
 
-	private float fuelPotency = 100f;
+	private float fuelPotency = 70f;
 
 	private float fuel = 0f;
 	private float Fuel { get => fuel; set { fuel = value; UpdateFuelDisplay(); } }
@@ -72,6 +72,7 @@ public class BeanEater : MonoBehaviour
 		rb.bodyType = RigidbodyType2D.Dynamic;
 
 		StartCoroutine(Rocket(power));
+		StartCoroutine(Scoring());
 	}
 
 	bool rocketLaunched = false;
@@ -91,6 +92,30 @@ public class BeanEater : MonoBehaviour
 		Fuel = 0f;
 	}
 
+	bool readyForScoring = false;
+
+	private IEnumerator Scoring()
+	{
+		float startPosition = transform.position.x;
+
+		yield return new WaitForSeconds(0.1f);
+
+		readyForScoring = true;
+
+		float distance = 0f;
+		while (readyForScoring)
+		{
+			distance = transform.position.x - startPosition;
+			string scoreText = $"Score: {(int)distance}";
+			GameController.Instance.UpdateScoreDisplay(scoreText);
+
+			yield return null;
+		}
+
+		Shop.Money += Mathf.Max(0, (int)distance);
+		GameController.Instance.ActivateShop();
+	}
+
 	public void UpdateFuelDisplay()
 	{
 		GameController.Instance.UpdateStatDisplay($"Fuel: {(int)Fuel}");
@@ -99,6 +124,19 @@ public class BeanEater : MonoBehaviour
 	// Upgrade actions
 	public void UpgradeAfterburner()
 	{
-		fuelPotency = 150f;
+		fuelPotency += 50f;
+	}
+
+	public void UpgradeFood()
+	{
+		fuelPerServing += 5f;
+	}
+
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
+		if (readyForScoring)
+		{
+			readyForScoring = false;
+		}
 	}
 }

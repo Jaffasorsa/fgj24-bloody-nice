@@ -73,7 +73,7 @@ public class BackgroundController : MonoBehaviour
 		if (CloudsEnabled && !cloudEmitterPS.isEmitting) cloudEmitterPS.Play();
 		else if (!CloudsEnabled && cloudEmitterPS.isEmitting) cloudEmitterPS.Stop();
 
-		cloudEmitter.position = target.position;
+		cloudEmitter.position = (Vector2)target.position;
 
 		skyContainer.transform.position = Vector3.up * target.position.y;
 

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
-	enum Panel { Eating, Aiming, Launch, None }
+	enum Panel { Eating, Aiming, Launch, Score, None }
 
 	[Header("General")]
 	[SerializeField]
@@ -20,6 +20,9 @@ public class GameController : MonoBehaviour
 
 	[SerializeField]
 	private TextMeshProUGUI statDisplayText;
+
+	[SerializeField]
+	private GameObject shop;
 
 	[Header("Eating")]
 	[SerializeField]
@@ -59,6 +62,13 @@ public class GameController : MonoBehaviour
 
 	[SerializeField]
 	private RectTransform powerBar;
+
+	[Header("Score")]
+	[SerializeField]
+	private GameObject scorePanel;
+
+	[SerializeField]
+	private TextMeshProUGUI scoreDisplayText;
 
 	private BeanEater beanEater;
 
@@ -206,7 +216,7 @@ public class GameController : MonoBehaviour
 	private void Launched(float power)
 	{
 		beanEater.Launch(power);
-		ChangePanel(Panel.None);
+		ChangePanel(Panel.Score);
 	}
 
 	private void ChangePanel(Panel panel)
@@ -214,10 +224,21 @@ public class GameController : MonoBehaviour
 		eatingPanel.SetActive(panel == Panel.Eating);
 		aimingPanel.SetActive(panel == Panel.Aiming);
 		launchPanel.SetActive(panel == Panel.Launch);
+		launchPanel.SetActive(panel == Panel.Launch);
 	}
 
 	public void UpdateStatDisplay(string text)
 	{
 		statDisplayText.text = text;
+	}
+
+	public void UpdateScoreDisplay(string text)
+	{
+		scoreDisplayText.text = text;
+	}
+
+	public void ActivateShop()
+	{
+		shop.SetActive(true);
 	}
 }

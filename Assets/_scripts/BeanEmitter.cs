@@ -5,10 +5,16 @@ using UnityEngine;
 public class BeanEmitter : MonoBehaviour
 {
 	[SerializeField]
-	private ParticleSystem particleSystem;
+	private List<ParticleSystem> particleSystems = new List<ParticleSystem>();
 
 	public void ShootBeans()
 	{
-		particleSystem.Play();
+		foreach (ParticleSystem particleSystem in particleSystems)
+		{
+			if (particleSystem.gameObject.activeSelf)
+			{
+				particleSystem.Play();
+			}
+		}
 	}
 }
